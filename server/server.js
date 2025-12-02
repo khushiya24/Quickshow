@@ -25,7 +25,6 @@
 
 // app.listen(port, () => console.log(`Server is listening at http://localhost:${port}`)) ;
 
-
 import express from "express";
 import cors from "cors";
 import "dotenv/config";
@@ -34,10 +33,8 @@ import { clerkMiddleware } from "@clerk/express";
 import { serve } from "inngest/express";
 import { inngest, functions } from "./inngest/index.js";
 
-
 const app = express();
 
-// Connect MongoDB once
 await connectDB();
 
 app.use(express.json());
@@ -48,8 +45,6 @@ app.get("/", (req, res) => {
   res.send("Quickshow Server is running on Vercel");
 });
 
-// Inngest route
 app.use("/api/inngest", serve({ client: inngest, functions }));
 
-// ❗ IMPORTANT FOR VERCEL — EXPORT HANDLER INSTEAD OF app.listen()
-export default app;
+export default app;   // ⬅ Vercel needs this
