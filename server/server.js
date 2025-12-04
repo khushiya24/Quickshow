@@ -25,21 +25,14 @@
 
 // app.listen(port, () => console.log(`Server is listening at http://localhost:${port}`)) ;
 
-
-
-
-
-
-
 import express from "express";
 import cors from "cors";
 import "dotenv/config";
-
-import connectDB from "./server/configs/db.js";
+import connectDB from "./configs/db.js";
 import { clerkMiddleware } from "@clerk/express";
 import { serve } from "inngest/express";
-import { inngest, functions } from "./server/inngest/index.js";
-import showRouter from "./server/routes/showRoutes.js";
+import { inngest, functions } from "./inngest/index.js";
+import showRouter from "./routes/showRoutes.js";
 
 const app = express();
 const port = 3000;
@@ -51,13 +44,12 @@ app.use(cors());
 app.use(clerkMiddleware());
 
 app.get("/", (req, res) => {
-  res.send("Quickshow Server running locally");
+  res.send("Quickshow Server is running on Vercel");
 });
 
 app.use("/api/inngest", serve({ client: inngest, functions }));
-app.use("/api/show", showRouter);
 
-app.listen(port, () =>
-  console.log(`Local server running at http://localhost:${port}`)
-);
+app.use('/api/show', showRouter);
+app.listen(port, () => console.log(`Server is listening at http://localhost:${port}`)) ;
 
+export default app;   // ⬅ Vercel needs this
