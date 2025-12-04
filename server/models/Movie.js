@@ -9,15 +9,13 @@ const movieSchema = new mongoose.Schema(
     backdrop_path: { type: String, required: true },
     release_date: { type: String, required: true },
     original_language: { type: String },
-    tagline: { type: String },          // ✔ fixed spelling
-    genres: { type: Array, default: [] }, // ✔ changed to optional
-    casts: { type: Array, default: [] },  // ✔ changed to optional
+    tagline: { type: String },
+    genres: { type: Array, default: [] },
+    casts: { type: Array, default: [] },
     vote_average: { type: Number, required: true },
     runtime: { type: Number, required: true }
   },
   { timestamps: true }
 );
 
-const Movie = mongoose.model("Movie", movieSchema);
-
-export default Movie;
+export default mongoose.model("Movie", movieSchema);
