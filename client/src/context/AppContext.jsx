@@ -99,74 +99,76 @@
 
 
 
-
-
-
 import { createContext, useContext, useEffect, useState } from "react";
 import axios from "axios";
 import { useAuth, useUser } from "@clerk/clerk-react";
-import { useLocation, useNavigate } from "react-router-dom";
-import toast from "react-hot-toast";
 
-
-axios.defaults.baseURL = import.meta.env.VITE_BASE_URL;
-
-export const AppContext = createContext();
+const AppContext = createContext();
 
 export const AppProvider = ({ children }) => {
-  const [isAdmin, setIsAdmin] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(null);
   const [shows, setShows] = useState([]);
-  const [FavoriteMovies, setFavoriteMovies] = useState([]);
-
-
-  const image_base_url = import.meta.env.VITE_TMDB_iMAGE_BASE_URL;
+  const [favoriteMovies, setFavoriteMovies] = useState([]);
 
   const { user } = useUser();
   const { getToken } = useAuth();
-  const location = useLocation();
-  const navigate = useNavigate();
 
-  const fetchIsAdmin = async () => {
+  const axiosInstance = axios.create({
+    baseURL: import.meta.env.VITE_BASE_URL,
+  });
+
+  // ✅ FIX: interceptor inside provider so getToken exists
+  axiosInstance.interceptors.request.use(async (config) => {
     try {
+      const token = await getToken();
+      if (token) {
+        config.headers.Authorization = `Bearer ${token}`;
+      }
+    } catch (err) {
+      console.log("Token error:", err);
+    }
+    return config;
+  });
+
+  const image_base_url = import.meta.env.VITE_TMDB_IMAGE_BASE_URL;
+
+  // Check admin
+  const fetchIsAdmin = async () => {
+    if (!user) return;
+
+    try {
+      const token = await getToken();
       const { data } = await axios.get("/api/admin/is-admin", {
-        headers: { Authorization: `Bearer ${await getToken()}` },
+        headers: { Authorization: `Bearer ${token}` },
       });
 
       setIsAdmin(data.isAdmin);
-
-      if (!data.isAdmin && location.pathname.startsWith("/admin")) {
-        navigate("/");
-        toast.error("You are not authorized to access admin dashboard");
-      }
     } catch (error) {
-      console.error(error);
+      console.error("Admin check failed:", error);
+      setIsAdmin(false);
     }
   };
 
+  // Fetch shows
   const fetchShows = async () => {
     try {
       const { data } = await axios.get("/api/show/all");
-      if (data.success) {
-        setShows(data.shows);
-      } else {
-         toast.error(data.message);
-      }
+      if (data.success) setShows(data.shows);
     } catch (error) {
       console.error(error);
     }
   };
 
   const fetchFavoriteMovies = async () => {
+    if (!user) return;
+
     try {
+      const token = await getToken();
       const { data } = await axios.get("/api/user/favorite", {
-        headers: { Authorization: `Bearer ${await getToken()}` },
+        headers: { Authorization: `Bearer ${token}` },
       });
 
-      if (data.success) {
-        setFavoriteMovies(data.movies);
-      } else {
-        toast.error(data.message);
-      }
+      if (data.success) setFavoriteMovies(data.movies);
     } catch (error) {
       console.error(error);
     }
@@ -180,24 +182,25 @@ export const AppProvider = ({ children }) => {
     if (user) {
       fetchIsAdmin();
       fetchFavoriteMovies();
+    } else {
+      setIsAdmin(null);
     }
   }, [user]);
 
-  const value = {
-    axios,
-    fetchIsAdmin,
-    user,
-    getToken,
-    navigate,
-    isAdmin,
-    shows,
-    FavoriteMovies,
-    fetchFavoriteMovies,
-    image_base_url
-  };
-
   return (
-    <AppContext.Provider value={value}>
+    <AppContext.Provider
+      value={{
+        axios: axiosInstance,
+        getToken,
+        user,
+        isAdmin,
+        shows,
+        fetchIsAdmin,
+        favoriteMovies,
+        fetchFavoriteMovies,
+        image_base_url,
+      }}
+    >
       {children}
     </AppContext.Provider>
   );

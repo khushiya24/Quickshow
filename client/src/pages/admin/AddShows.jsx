@@ -210,223 +210,767 @@
 
 
 
-import React, { useEffect, useState } from 'react';
-import Loading from '../../components/Loading';
-import Title from '../../components/admin/Title';
-import { CheckIcon, DeleteIcon, StarIcon } from 'lucide-react';
-import { kConverter } from '../../lib/kConverter';
-import { useAppContext } from '../../context/AppContext';
-import toast from 'react-hot-toast';
+// import React, { useEffect, useState } from 'react';
+// import Loading from '../../components/Loading';
+// import Title from '../../components/admin/Title';
+// import { CheckIcon, DeleteIcon, StarIcon } from 'lucide-react';
+// import { kConverter } from '../../lib/kConverter';
+// import { useAppContext } from '../../context/AppContext';
+// import toast from 'react-hot-toast';
+
+// const AddShows = () => {
+// const { axios, getToken, user, image_base_url } = useAppContext();
+// const currency = import.meta.env.VITE_CURRENCY;
+
+// const [nowPlayingMovies, setNowPlayingMovies] = useState([]);
+// const [selectedMovie, setSelectedMovie] = useState(null);
+// const [dateTimeInput, setDateTimeInput] = useState('');
+// const [showPrice, setShowPrice] = useState('');
+// const [dateTimeSelection, setDateTimeSelection] = useState({});
+// const [addingShow, setAddingShow] = useState(false);
+
+// // Fetch movies
+// const fetchNowPlayingMovies = async () => {
+// try {
+// const { data } = await axios.get('/api/show/now-playing', {
+// headers: { Authorization: `Bearer ${await getToken()}` },
+// });
+// if (data.success) setNowPlayingMovies(data.movies);
+// } catch (error) {
+// console.error('Error fetching movies:', error);
+// }
+// };
+
+// // Add date-time
+// const handleDateTimeAdd = () => {
+//   if (!dateTimeInput) return;
+
+//   const [date, time] = dateTimeInput.split("T");
+//   if (!date || !time) return;
+
+//   setDateTimeSelection((prev) => {
+//     const times = prev[date] || [];
+//     if (!times.includes(time)) {
+//       return { ...prev, [date]: [...times, time] };
+//     }
+//     return prev;
+//   });
+// };
+
+
+// // Remove date-time
+// const handleRemoveTime = (date, time) => {
+// setDateTimeSelection((prev) => {
+// const filteredTimes = prev[date].filter((t) => t !== time);
+// if (filteredTimes.length === 0) {
+// const { [date]: _, ...rest } = prev;
+// return rest;
+// }
+// return { ...prev, [date]: filteredTimes };
+// });
+// };
+
+// const handleSubmit = async () => {
+//   try {
+//     setAddingShow(true);
+
+//     if (!selectedMovie || Object.keys(dateTimeSelection).length === 0 || !showPrice) {
+//       toast.error("Missing required fields");
+//       return;
+//     }
+
+//     const showsInput = [];
+//     Object.entries(dateTimeSelection).forEach(([date, times]) => {
+//       times.forEach((time) => {
+//         showsInput.push({
+//           showDateTime: `${date}T${time}`,
+//         });
+//       });
+//     });
+
+//     const payload = {
+//       movieId: selectedMovie,
+//       showsInput,
+//       showPrice: Number(showPrice),
+//     };
+
+//     const { data } = await axios.post(
+//       "/api/show/add",
+//       payload,
+//       { headers: { Authorization: `Bearer ${await getToken()}` } }
+//     );
+
+//     if (data.success) {
+//       toast.success(data.message);
+//       setSelectedMovie(null);
+//       setDateTimeSelection({});
+//       setShowPrice("");
+//     } else {
+//       toast.error(data.message);
+//     }
+//   } catch (error) {
+//     console.error("submission error:", error);
+//     toast.error("An error occurred. Please try again");
+//   } finally {
+//     setAddingShow(false);
+//   }
+// };
+
+
+// useEffect(() => {
+//   if(user){
+//     fetchNowPlayingMovies();
+
+
+//   }
+// }, [user]);
+
+// if (nowPlayingMovies.length === 0) return <Loading />;
+
+// return (
+// <> <Title text1="Add" text2="Shows" />
+
+
+//   <p className="mt-10 text-lg font-medium">Now Playing Movies</p>
+//   <div className="overflow-x-auto pb-4">
+//     <div className="group flex flex-wrap gap-4 mt-4 w-max">
+//       {nowPlayingMovies.map((movie) => (
+//         <div
+//           key={movie.id}
+//           className="relative max-w-40 cursor-pointer group-hover:not-hover:opacity-40 hover:-translate-y-1 transition duration-300"
+//           onClick={() => setSelectedMovie(movie.id)}
+//         >
+//           <div className="relative rounded-lg overflow-hidden">
+//             <img
+//               src={image_base_url + movie.poster_path}
+//               alt={movie.title}
+//               className="w-full h-60 object-cover brightness-90"
+//             />
+//             <div className="text-sm flex items-center justify-between p-2 bg-black/70 w-full absolute bottom-0 left-0">
+//               <p className="flex items-center gap-1 text-gray-400">
+//                 <StarIcon className="w-4 h-4 text-primary fill-primary" />
+//                 {movie.vote_average.toFixed(1)}
+//               </p>
+//               <p className="text-gray-300">{kConverter(movie.vote_count)} Votes</p>
+//             </div>
+//           </div>
+
+//           {selectedMovie === movie.id && (
+//             <div className="absolute top-2 right-2 flex items-center justify-center bg-primary w-6 h-6 rounded">
+//               <CheckIcon className="w-4 h-4 text-white" strokeWidth={2.5} />
+//             </div>
+//           )}
+
+//           <p className="font-medium truncate">{movie.title}</p>
+//           <p className="text-gray-400 text-sm">{movie.release_date}</p>
+//         </div>
+//       ))}
+//     </div>
+//   </div>
+
+//   {/* Price Input */}
+//   <div className="mt-8">
+//     <label className="block text-sm font-medium mb-2">Show price</label>
+//     <div className="inline-flex items-center gap-2 border border-gray-600 px-3 py-2 rounded-md">
+//       <p className="text-gray-400 text-sm">{currency}</p>
+//       <input
+//         min={0}
+//         type="number"
+//         value={showPrice}
+//         onChange={(e) => setShowPrice(e.target.value)}
+//         placeholder="Enter show price"
+//         className="outline-none"
+//       />
+//     </div>
+//   </div>
+
+//   {/* Date-Time Input */}
+//   <div className="mt-6">
+//     <label className="block text-sm font-medium mb-2">Show Date & Time</label>
+//     <div className="inline-flex gap-5 border border-gray-600 p-1 pl-3 rounded-lg">
+//       <input
+//         type="datetime-local"
+//         value={dateTimeInput}
+//         onChange={(e) => setDateTimeInput(e.target.value)}
+//         className="rounded-md outline-none"
+//       />
+//       <button
+//         onClick={handleDateTimeAdd}
+//         className="bg-primary/80 text-white px-3 py-2 text-sm rounded-lg hover:bg-primary cursor-pointer"
+//       >
+//         Add Time
+//       </button>
+//     </div>
+//   </div>
+
+//   {/* Selected Times */}
+//   {Object.keys(dateTimeSelection).length > 0 && (
+//     <div className="mt-6">
+//       <h2 className="mb-2">Selected Date-Time</h2>
+//       <ul className="space-y-3">
+//         {Object.entries(dateTimeSelection).map(([date, times]) => (
+//           <li key={date}>
+//             <div className="font-medium">{date}</div>
+//             <div className="flex flex-wrap gap-2 mt-1 text-sm">
+//               {times.map((time) => (
+//                 <div
+//                   key={time}
+//                   className="border border-primary px-2 py-1 flex items-center rounded"
+//                 >
+//                   <span>{time}</span>
+//                   <DeleteIcon
+//                     onClick={() => handleRemoveTime(date, time)}
+//                     width={15}
+//                     className="ml-2 text-red-500 hover:text-red-700 cursor-pointer"
+//                   />
+//                 </div>
+//               ))}
+//             </div>
+//           </li>
+//         ))}
+//       </ul>
+//     </div>
+//   )}
+
+//   <button onClick={handleSubmit} disabled={addingShow} className="bg-primary text-white px-8 py-2 mt-6 rounded hover:bg-primary/90 transition-all cursor-pointer">
+//     Add Show
+//   </button>
+// </>
+
+
+// );
+// };
+
+// export default AddShows;
+
+
+
+
+
+
+
+
+
+import React, { useEffect, useState } from "react";
+import Loading from "../../components/Loading";
+import Title from "../../components/admin/Title";
+import { CheckIcon, DeleteIcon, StarIcon } from "lucide-react";
+import { kConverter } from "../../lib/kConverter";
+import { useAppContext } from "../../context/AppContext";
+import toast from "react-hot-toast";
 
 const AddShows = () => {
-const { axios, getToken, user, image_base_url } = useAppContext();
-const currency = import.meta.env.VITE_CURRENCY;
+  const [loading, setLoading] = useState(true);
 
-const [nowPlayingMovies, setNowPlayingMovies] = useState([]);
-const [selectedMovie, setSelectedMovie] = useState(null);
-const [dateTimeInput, setDateTimeInput] = useState('');
-const [showPrice, setShowPrice] = useState('');
-const [dateTimeSelection, setDateTimeSelection] = useState({});
-const [addingShow, setAddingShow] = useState(false);
+  const { axios, getToken, image_base_url } = useAppContext();
+  const currency = import.meta.env.VITE_CURRENCY;
 
-// Fetch movies
-const fetchNowPlayingMovies = async () => {
-try {
-const { data } = await axios.get('/api/show/now-playing', {
-headers: { Authorization: `Bearer ${await getToken()}` },
-});
-if (data.success) setNowPlayingMovies(data.movies);
-} catch (error) {
-console.error('Error fetching movies:', error);
-}
+  const [nowPlayingMovies, setNowPlayingMovies] = useState([]);
+  const [selectedMovie, setSelectedMovie] = useState(null);
+  const [dateTimeInput, setDateTimeInput] = useState("");
+  const [showPrice, setShowPrice] = useState("");
+  const [dateTimeSelection, setDateTimeSelection] = useState({});
+  const [addingShow, setAddingShow] = useState(false);
+
+  /* ================= FETCH MOVIES ================= */
+  const fetchNowPlayingMovies = async () => {
+  try {
+    setLoading(true);
+
+    const token = await getToken();
+    const { data } = await axios.get("/api/show/now-playing", {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    console.log("API RESPONSE:", data);
+
+    if (data.success) {
+      setNowPlayingMovies(data.movies || []);
+    } else {
+      toast.error(data.message || "Failed to load movies");
+    }
+  } catch (error) {
+    console.error(error);
+    toast.error("Failed to load movies");
+  } finally {
+    setLoading(false);
+  }
 };
 
-// Add date-time
-const handleDateTimeAdd = () => {
-if (!dateTimeInput) return;
-const [date, time] = dateTimeInput.split('T');
-if (!date || !time) return;
-
-```
-setDateTimeSelection((prev) => {
-  const times = prev[date] || [];
-  if (!times.includes(time)) {
-    return { ...prev, [date]: [...times, time] };
-  }
-  return prev;
-});
-```
-
-};
-
-// Remove date-time
-const handleRemoveTime = (date, time) => {
-setDateTimeSelection((prev) => {
-const filteredTimes = prev[date].filter((t) => t !== time);
-if (filteredTimes.length === 0) {
-const { [date]: _, ...rest } = prev;
-return rest;
-}
-return { ...prev, [date]: filteredTimes };
-});
-};
-
-const handleSubmit = async () => {
-  try{
-    setAddingShow(true)
-
-    if(!selectedMovie || Object.keys(dateTimeSelection).length === 0 || !showPrice){
-      return toast('Missing required fields');
-    }
-    const showsInput = Object.entries(dateTimeSelection).map(([date,time]) => ({date,time}));
-
-    const payload = {
-      movieId: selectedMovie,
-      showsInput,
-      showPrice: Number(showPrice)
-    }
-    const {data} = await axios.post('/api/show/add', payload,{headers: {Authorization: `Bearer ${await getToken()}`}})
-
-    if(data.success){
-      toast.success(data.message)
-      setSelectedMovie(null)
-      setDateTimeSelection([])
-      setShowPrice("")
-    }else{
-       toast.error(data.message)
+  /* ================= ADD DATE & TIME ================= */
+  const handleDateTimeAdd = () => {
+    if (!dateTimeInput) {
+      toast.error("Select date & time");
+      return;
     }
 
-  } catch(error) {
-    console.error("submission error:", error);
-    toast.error('An error occured.Please try again')
-    
+    const [date, time] = dateTimeInput.split("T");
+    if (!date || !time) return;
 
-  }
-  setAddingShow(false)
-}
+    setDateTimeSelection((prev) => {
+      const times = prev[date] || [];
+      if (times.includes(time)) return prev;
+      return { ...prev, [date]: [...times, time] };
+    });
 
-useEffect(() => {
-  if(user){
-    fetchNowPlayingMovies();
+    setDateTimeInput("");
+  };
+
+  /* ================= REMOVE TIME ================= */
+  const handleRemoveTime = (date, time) => {
+    setDateTimeSelection((prev) => {
+      const updatedTimes = prev[date].filter((t) => t !== time);
+      if (updatedTimes.length === 0) {
+        const { [date]: _, ...rest } = prev;
+        return rest;
+      }
+      return { ...prev, [date]: updatedTimes };
+    });
+  };
+
+  /* ================= SUBMIT ================= */
+  const handleSubmit = async () => {
+    if (!selectedMovie) {
+      toast.error("Please select a movie");
+      return;
+    }
+
+    if (!showPrice || Number(showPrice) <= 0) {
+      toast.error("Enter valid show price");
+      return;
+    }
+
+    if (Object.keys(dateTimeSelection).length === 0) {
+      toast.error("Add at least one show time");
+      return;
+    }
+
+    try {
+      setAddingShow(true);
+
+      const showsInput = [];
+      Object.entries(dateTimeSelection).forEach(([date, times]) => {
+        times.forEach((time) => {
+          showsInput.push({ date, time });
+        });
+      });
+
+      const payload = {
+        movieId: selectedMovie,
+        showsInput,
+        showPrice: Number(showPrice),
+      };
+
+      const { data } = await axios.post(
+        "/api/show/add",
+        payload,
+        {
+          headers: {
+            Authorization: `Bearer ${await getToken()}`,
+          },
+        }
+      );
+
+      if (data.success) {
+        toast.success("Show added successfully");
+        setSelectedMovie(null);
+        setDateTimeSelection({});
+        setShowPrice("");
+      } else {
+        toast.error(data.message || "Failed to add show");
+      }
+    } catch (error) {
+      console.error("Submission error:", error.response?.data || error.message);
+      toast.error("Something went wrong");
+    } finally {
+      setAddingShow(false);
+    }
+  };
+
+  /* ================= EFFECT ================= */
+  useEffect(() => {
+  fetchNowPlayingMovies();
+}, []);
 
 
-  }
-}, [user]);
+  if (loading) return <Loading />;
 
-if (nowPlayingMovies.length === 0) return <Loading />;
 
-return (
-<> <Title text1="Add" text2="Shows" />
+  return (
+    <>
+      <Title text1="Add" text2="Shows" />
 
-```
-  <p className="mt-10 text-lg font-medium">Now Playing Movies</p>
-  <div className="overflow-x-auto pb-4">
-    <div className="group flex flex-wrap gap-4 mt-4 w-max">
-      {nowPlayingMovies.map((movie) => (
-        <div
-          key={movie.id}
-          className="relative max-w-40 cursor-pointer group-hover:not-hover:opacity-40 hover:-translate-y-1 transition duration-300"
-          onClick={() => setSelectedMovie(movie.id)}
-        >
-          <div className="relative rounded-lg overflow-hidden">
-            <img
-              src={image_base_url + movie.poster_path}
-              alt={movie.title}
-              className="w-full h-60 object-cover brightness-90"
-            />
-            <div className="text-sm flex items-center justify-between p-2 bg-black/70 w-full absolute bottom-0 left-0">
-              <p className="flex items-center gap-1 text-gray-400">
-                <StarIcon className="w-4 h-4 text-primary fill-primary" />
-                {movie.vote_average.toFixed(1)}
-              </p>
-              <p className="text-gray-300">{kConverter(movie.vote_count)} Votes</p>
+      <p className="mt-10 text-lg font-medium">Now Playing Movies</p>
+
+      {/* ===== VERTICAL MOVIE LIST ===== */}
+      <div className="mt-4 flex flex-col gap-4 max-w-md">
+        {nowPlayingMovies.map((movie) => (
+          <div
+            key={movie.id}
+            onClick={() => setSelectedMovie(movie.id)}
+            className={`cursor-pointer rounded-lg border p-3 transition ${
+              selectedMovie === movie.id
+                ? "border-primary bg-primary/10"
+                : "border-gray-600 hover:bg-white/5"
+            }`}
+          >
+            <div className="flex gap-3">
+              <img
+                src={image_base_url + movie.poster_path}
+                alt={movie.title}
+                className="w-20 h-28 rounded object-cover"
+              />
+
+              <div className="flex-1">
+                <p className="font-medium">{movie.title}</p>
+                <p className="text-sm text-gray-400">{movie.release_date}</p>
+                <div className="flex items-center gap-1 text-sm mt-1">
+                  <StarIcon className="w-4 h-4 text-primary fill-primary" />
+                  {movie.vote_average.toFixed(1)}
+                  <span className="text-gray-400 ml-1">
+                    ({kConverter(movie.vote_count)})
+                  </span>
+                </div>
+              </div>
+
+              {selectedMovie === movie.id && (
+                <CheckIcon className="text-primary" />
+              )}
             </div>
           </div>
-
-          {selectedMovie === movie.id && (
-            <div className="absolute top-2 right-2 flex items-center justify-center bg-primary w-6 h-6 rounded">
-              <CheckIcon className="w-4 h-4 text-white" strokeWidth={2.5} />
-            </div>
-          )}
-
-          <p className="font-medium truncate">{movie.title}</p>
-          <p className="text-gray-400 text-sm">{movie.release_date}</p>
-        </div>
-      ))}
-    </div>
-  </div>
-
-  {/* Price Input */}
-  <div className="mt-8">
-    <label className="block text-sm font-medium mb-2">Show price</label>
-    <div className="inline-flex items-center gap-2 border border-gray-600 px-3 py-2 rounded-md">
-      <p className="text-gray-400 text-sm">{currency}</p>
-      <input
-        min={0}
-        type="number"
-        value={showPrice}
-        onChange={(e) => setShowPrice(e.target.value)}
-        placeholder="Enter show price"
-        className="outline-none"
-      />
-    </div>
-  </div>
-
-  {/* Date-Time Input */}
-  <div className="mt-6">
-    <label className="block text-sm font-medium mb-2">Show Date & Time</label>
-    <div className="inline-flex gap-5 border border-gray-600 p-1 pl-3 rounded-lg">
-      <input
-        type="datetime-local"
-        value={dateTimeInput}
-        onChange={(e) => setDateTimeInput(e.target.value)}
-        className="rounded-md outline-none"
-      />
-      <button
-        onClick={handleDateTimeAdd}
-        className="bg-primary/80 text-white px-3 py-2 text-sm rounded-lg hover:bg-primary cursor-pointer"
-      >
-        Add Time
-      </button>
-    </div>
-  </div>
-
-  {/* Selected Times */}
-  {Object.keys(dateTimeSelection).length > 0 && (
-    <div className="mt-6">
-      <h2 className="mb-2">Selected Date-Time</h2>
-      <ul className="space-y-3">
-        {Object.entries(dateTimeSelection).map(([date, times]) => (
-          <li key={date}>
-            <div className="font-medium">{date}</div>
-            <div className="flex flex-wrap gap-2 mt-1 text-sm">
-              {times.map((time) => (
-                <div
-                  key={time}
-                  className="border border-primary px-2 py-1 flex items-center rounded"
-                >
-                  <span>{time}</span>
-                  <DeleteIcon
-                    onClick={() => handleRemoveTime(date, time)}
-                    width={15}
-                    className="ml-2 text-red-500 hover:text-red-700 cursor-pointer"
-                  />
-                </div>
-              ))}
-            </div>
-          </li>
         ))}
-      </ul>
-    </div>
-  )}
+      </div>
 
-  <button onClick={handleSubmit} disabled={addingShow} className="bg-primary text-white px-8 py-2 mt-6 rounded hover:bg-primary/90 transition-all cursor-pointer">
-    Add Show
-  </button>
-</>
+      {/* ===== PRICE ===== */}
+      <div className="mt-6">
+        <label className="block mb-2 text-sm font-medium">Show Price</label>
+        <div className="flex items-center gap-2 border px-3 py-2 rounded">
+          <span className="text-gray-400">{currency}</span>
+          <input
+            type="number"
+            min="1"
+            value={showPrice}
+            onChange={(e) => setShowPrice(e.target.value)}
+            className="outline-none bg-transparent"
+            placeholder="Enter price"
+          />
+        </div>
+      </div>
 
+      {/* ===== DATE TIME ===== */}
+      <div className="mt-6">
+        <label className="block mb-2 text-sm font-medium">
+          Show Date & Time
+        </label>
+        <div className="flex gap-3">
+          <input
+            type="datetime-local"
+            value={dateTimeInput}
+            onChange={(e) => setDateTimeInput(e.target.value)}
+            className="border px-3 py-2 rounded"
+          />
+          <button
+            onClick={handleDateTimeAdd}
+            className="bg-primary px-4 rounded text-white"
+          >
+            Add
+          </button>
+        </div>
+      </div>
 
-);
+      {/* ===== SELECTED TIMES ===== */}
+      {Object.keys(dateTimeSelection).length > 0 && (
+        <div className="mt-6 space-y-3">
+          {Object.entries(dateTimeSelection).map(([date, times]) => (
+            <div key={date}>
+              <p className="font-medium">{date}</p>
+              <div className="flex gap-2 flex-wrap mt-1">
+                {times.map((time) => (
+                  <span
+                    key={time}
+                    className="border px-2 py-1 rounded flex items-center gap-1"
+                  >
+                    {time}
+                    <DeleteIcon
+                      className="w-4 cursor-pointer text-red-500"
+                      onClick={() => handleRemoveTime(date, time)}
+                    />
+                  </span>
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* ===== SUBMIT ===== */}
+      <button
+        onClick={handleSubmit}
+        disabled={addingShow}
+        className="mt-6 bg-primary px-8 py-2 rounded text-white disabled:opacity-50"
+      >
+        {addingShow ? "Adding..." : "Add Show"}
+      </button>
+    </>
+  );
 };
 
 export default AddShows;
+
+
+
+
+
+
+
+
+
+
+
+// import React, { useEffect, useState } from 'react';
+// import Loading from '../../components/Loading';
+// import Title from '../../components/admin/Title';
+// import { CheckIcon, Trash2 as DeleteIcon, StarIcon } from 'lucide-react';
+// import { kConverter } from '../../lib/kConverter';
+// import { useAppContext } from '../../context/AppContext';
+// import toast from 'react-hot-toast';
+
+// const AddShows = () => {
+//   const { axios, getToken, user, image_base_url } = useAppContext();
+//   const currency = import.meta.env.VITE_CURRENCY;
+
+//   const [nowPlayingMovies, setNowPlayingMovies] = useState([]);
+//   const [selectedMovie, setSelectedMovie] = useState(null);
+//   const [dateTimeInput, setDateTimeInput] = useState('');
+//   const [showPrice, setShowPrice] = useState('');
+//   const [dateTimeSelection, setDateTimeSelection] = useState({});
+//   const [addingShow, setAddingShow] = useState(false);
+
+//   // Fetch movies
+//   const fetchNowPlayingMovies = async () => {
+//     try {
+//       const { data } = await axios.get('/api/show/now-playing', {
+//         headers: { Authorization: `Bearer ${await getToken()}` },
+//       });
+//       if (data.success) setNowPlayingMovies(data.movies);
+//     } catch (error) {
+//       console.error('Error fetching movies:', error);
+//     }
+//   };
+
+//   // Add date-time safely
+//   const handleDateTimeAdd = () => {
+//     if (!dateTimeInput) return;
+
+//     const [date, time] = dateTimeInput.split('T');
+//     if (!date || !time) return;
+
+//     setDateTimeSelection((prev) => {
+//       const times = Array.isArray(prev[date]) ? prev[date] : [];
+//       if (!times.includes(time)) {
+//         return { ...prev, [date]: [...times, time] };
+//       }
+//       return prev;
+//     });
+
+//     setDateTimeInput('');
+//   };
+
+//   // Remove date-time safely
+//   const handleRemoveTime = (date, time) => {
+//     setDateTimeSelection((prev) => {
+//       const times = Array.isArray(prev[date]) ? prev[date] : [];
+//       const filteredTimes = times.filter((t) => t !== time);
+//       if (filteredTimes.length === 0) {
+//         const { [date]: _, ...rest } = prev;
+//         return rest;
+//       }
+//       return { ...prev, [date]: filteredTimes };
+//     });
+//   };
+
+//   // Handle submit safely
+//   const handleSubmit = async () => {
+//     setAddingShow(true);
+//     try {
+//       if (!selectedMovie || Object.keys(dateTimeSelection).length === 0 || !showPrice) {
+//         toast.error('Missing required fields');
+//         setAddingShow(false);
+//         return;
+//       }
+
+//       // Normalize dateTimeSelection to ensure all values are arrays
+//       const normalizedSelection = {};
+//       Object.entries(dateTimeSelection).forEach(([date, times]) => {
+//         normalizedSelection[date] = Array.isArray(times) ? times : [];
+//       });
+
+//       const showsInput = [];
+//       Object.entries(normalizedSelection).forEach(([date, times]) => {
+//         times.forEach((time) => {
+//           showsInput.push({ showDateTime: `${date}T${time}` });
+//         });
+//       });
+
+//       if (showsInput.length === 0) {
+//         toast.error('No valid date-time selected');
+//         setAddingShow(false);
+//         return;
+//       }
+
+//       const payload = {
+//         movieId: selectedMovie,
+//         showsInput,
+//         showPrice: Number(showPrice),
+//       };
+
+//       const { data } = await axios.post('/api/show/add', payload, {
+//         headers: { Authorization: `Bearer ${await getToken()}` },
+//       });
+
+//       if (data.success) {
+//         toast.success(data.message);
+//         setSelectedMovie(null);
+//         setDateTimeSelection({});
+//         setShowPrice('');
+//       } else {
+//         toast.error(data.message);
+//       }
+//     } catch (error) {
+//       console.error('Submission error:', error);
+//       toast.error('An error occurred. Please try again');
+//     } finally {
+//       setAddingShow(false);
+//     }
+//   };
+
+//   useEffect(() => {
+//     if (user) fetchNowPlayingMovies();
+//   }, [user]);
+
+//   if (nowPlayingMovies.length === 0) return <Loading />;
+
+//   return (
+//     <>
+//       <Title text1="Add" text2="Shows" />
+
+//       <p className="mt-10 text-lg font-medium">Now Playing Movies</p>
+//       <div className="overflow-x-auto pb-4">
+//         <div className="group flex flex-wrap gap-4 mt-4 w-max">
+//           {nowPlayingMovies.map((movie) => (
+//             <div
+//               key={movie.id}
+//               className="relative max-w-40 cursor-pointer group-hover:not-hover:opacity-40 hover:-translate-y-1 transition duration-300"
+//               onClick={() => setSelectedMovie(movie.id)}
+//             >
+//               <div className="relative rounded-lg overflow-hidden">
+//                 <img
+//                   src={image_base_url + movie.poster_path}
+//                   alt={movie.title}
+//                   className="w-full h-60 object-cover brightness-90"
+//                 />
+//                 <div className="text-sm flex items-center justify-between p-2 bg-black/70 w-full absolute bottom-0 left-0">
+//                   <p className="flex items-center gap-1 text-gray-400">
+//                     <StarIcon className="w-4 h-4 text-primary fill-primary" />
+//                     {movie.vote_average.toFixed(1)}
+//                   </p>
+//                   <p className="text-gray-300">{kConverter(movie.vote_count)} Votes</p>
+//                 </div>
+//               </div>
+
+//               {selectedMovie === movie.id && (
+//                 <div className="absolute top-2 right-2 flex items-center justify-center bg-primary w-6 h-6 rounded">
+//                   <CheckIcon className="w-4 h-4 text-white" strokeWidth={2.5} />
+//                 </div>
+//               )}
+
+//               <p className="font-medium truncate">{movie.title}</p>
+//               <p className="text-gray-400 text-sm">{movie.release_date}</p>
+//             </div>
+//           ))}
+//         </div>
+//       </div>
+
+//       {/* Price Input */}
+//       <div className="mt-8">
+//         <label className="block text-sm font-medium mb-2">Show price</label>
+//         <div className="inline-flex items-center gap-2 border border-gray-600 px-3 py-2 rounded-md">
+//           <p className="text-gray-400 text-sm">{currency}</p>
+//           <input
+//             min={0}
+//             type="number"
+//             value={showPrice}
+//             onChange={(e) => setShowPrice(e.target.value)}
+//             placeholder="Enter show price"
+//             className="outline-none"
+//           />
+//         </div>
+//       </div>
+
+//       {/* Date-Time Input */}
+//       <div className="mt-6">
+//         <label className="block text-sm font-medium mb-2">Show Date & Time</label>
+//         <div className="inline-flex gap-5 border border-gray-600 p-1 pl-3 rounded-lg">
+//           <input
+//             type="datetime-local"
+//             value={dateTimeInput}
+//             onChange={(e) => setDateTimeInput(e.target.value)}
+//             className="rounded-md outline-none"
+//           />
+//           <button
+//             onClick={handleDateTimeAdd}
+//             className="bg-primary/80 text-white px-3 py-2 text-sm rounded-lg hover:bg-primary cursor-pointer"
+//           >
+//             Add Time
+//           </button>
+//         </div>
+//       </div>
+
+//       {/* Selected Times (fully safe rendering) */}
+//       {Object.keys(dateTimeSelection).length > 0 && (
+//         <div className="mt-6">
+//           <h2 className="mb-2">Selected Date-Time</h2>
+//           <ul className="space-y-3">
+//             {Object.entries(dateTimeSelection).map(([date, times]) => {
+//               const safeTimes = Array.isArray(times) ? times : [];
+//               if (safeTimes.length === 0) return null;
+
+//               return (
+//                 <li key={date}>
+//                   <div className="font-medium">{date}</div>
+//                   <div className="flex flex-wrap gap-2 mt-1 text-sm">
+//                     {safeTimes.map((time) => (
+//                       <div
+//                         key={time}
+//                         className="border border-primary px-2 py-1 flex items-center rounded"
+//                       >
+//                         <span>{time}</span>
+//                         <DeleteIcon
+//                           onClick={() => handleRemoveTime(date, time)}
+//                           width={15}
+//                           className="ml-2 text-red-500 hover:text-red-700 cursor-pointer"
+//                         />
+//                       </div>
+//                     ))}
+//                   </div>
+//                 </li>
+//               );
+//             })}
+//           </ul>
+//         </div>
+//       )}
+
+//       <button
+//         onClick={handleSubmit}
+//         disabled={addingShow}
+//         className="bg-primary text-white px-8 py-2 mt-6 rounded hover:bg-primary/90 transition-all cursor-pointer"
+//       >
+//         Add Show
+//       </button>
+//     </>
+//   );
+// };
+
+// export default AddShows;

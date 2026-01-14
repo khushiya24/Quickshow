@@ -36,6 +36,11 @@
 
 // export default FeaturedSection
 
+
+
+
+
+
 import React from 'react'
 import { useNavigate } from 'react-router-dom';
 import { ArrowRight } from "lucide-react";
@@ -89,5 +94,7 @@ const FeaturedSection = () => {
 }
 
 export default FeaturedSection
+
+
 
 

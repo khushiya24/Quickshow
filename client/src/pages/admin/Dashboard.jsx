@@ -9,7 +9,10 @@ import { dateFormat } from '../../lib/dateFormat';
 
 const Dashboard = () => {
 
+  
+
   const currency = import.meta.env.VITE_CURRENCY
+
 
   const [dashboardData, setDashboardData] = useState({
     totalBookings: 0,

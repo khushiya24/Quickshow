@@ -17,23 +17,23 @@
 // };
 
 
-import { requireAuth, clerkClient } from "@clerk/express";
+
+
+import { requireAuth } from "@clerk/express";
 
 export const protectAdmin = [
-    requireAuth(), // ensures user is logged in
-    async (req, res, next) => {
-        try {
-            const userId = req.auth.userId;
-            const user = await clerkClient.users.getUser(userId);
+  requireAuth(),
 
-            if (user.privateMetadata?.role !== "admin") {
-                return res.status(403).json({ success: false, message: "Not authorized" });
-            }
+  (req, res, next) => {
+    const role = req.auth?.sessionClaims?.publicMetadata?.role;
 
-            next();
-        } catch (error) {
-            console.error("Admin auth error:", error);
-            return res.status(401).json({ success: false, message: "Not authorized" });
-        }
+    if (role !== "admin") {
+      return res.status(403).json({
+        success: false,
+        message: "Admin access required",
+      });
     }
+
+    next();
+  },
 ];
