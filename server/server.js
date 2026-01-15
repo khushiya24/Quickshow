@@ -94,13 +94,13 @@ import userRouter from "./routes/userRoutes.js";
 import { stripeWebhooks } from "./controllers/stripeWebhooks.js";
 
 const app = express();
-const port = 3000;
+const port = 5000;
 
 await connectDB();
 
 // 🔵 Stripe Webhooks (must be before express.json)
-app.post(
-  "/api/stripe/webhook",
+app.use(
+  "/api/stripe",
   express.raw({ type: "application/json" }),
   stripeWebhooks
 );
@@ -134,7 +134,7 @@ app.get("/", (req, res) => {
 // Routes
 app.use("/api/inngest", serve({ client: inngest, functions }));
 app.use("/api/show", showRouter);
-app.use("/api/booking", bookingRouter);
+app.use("/api/bookings", bookingRouter);
 app.use("/api/admin", adminRouter);
 app.use("/api/user", userRouter);
 

@@ -205,7 +205,7 @@ const SeatLayout = () => {
   const getOccupiedSeats = async () => {
   if (!selectedTime?.showId) return;  // prevents undefined ID
   try {
-    const { data } = await axios.get(`/api/booking/seats/${selectedTime.showId}`);
+    const { data } = await axios.get(`/api/bookings/seats/${selectedTime.showId}`);
     if (data.success) setOccupiedSeats(data.occupiedSeats);
     else toast.error(data.message);
   } catch (error) {
@@ -223,7 +223,7 @@ const SeatLayout = () => {
  
 
 
-      const { data } = await axios.post('/api/booking/create', {
+      const { data } = await axios.post('/api/bookings/create', {
   showId: selectedTime.showId,
   selectedSeats
 }, {
@@ -231,7 +231,8 @@ const SeatLayout = () => {
 });
 
       if(data.success){
-        window.location.href = data.url;
+        // navigate("/my-bookings");
+        window.location.href =  data.url;
       }
       else{
         toast.error(data.message);
