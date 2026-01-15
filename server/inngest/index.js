@@ -2,6 +2,7 @@ import { Inngest } from "inngest";
 import User from "../models/User.js";
 import Booking from "../models/Booking.js";
 import Show from "../models/Show.js";
+import sendEmail from "../configs/nodeMailer.js";
 // Create a client to send and receive events
 export const inngest = new Inngest({ id: "movie-ticket-booking" });
 
@@ -83,10 +84,51 @@ const releaseSeatsAndDeleteBooking = inngest.createFunction(
     }
 )
 
+// inngest fun to send email  when user books a show
+const sendBookingConfirmationEmail = inngest.createFunction({
+    id: 'send-booking-confirmation-email'},
+    {event: 'app/show.booked'},
+    async ({ event, step}) => {
+        const {bookingId} = event.data;
+
+        const booking = await Booking.findById(bookingId).populate({
+            path: 'show',
+            populate: {path: 'movie', 
+            model: 'Movie'}
+        }).populate('user');
+
+        await sendEmail({
+            to: booking.user.email,
+            subject: `Booking Confirmation - Quickshow: "${booking.show.movie.title}"`,
+            body: `
+            <h1>Booking Confirmation</h1>
+            <p>Dear ${booking.user.name},</p>
+            <p>Thank you for booking with Quickshow! Here are your booking details:</p>
+            <ul>
+                <li><strong>Movie:</strong> ${booking.show.movie.title}</li>
+                <li><strong>Showtime:</strong> ${new Date(booking.show.startTime).toLocaleString()}</li>
+                <li><strong>Seats:</strong> ${booking.bookedSeats.join(', ')}</li>
+                <li><strong>Total Amount:</strong> $${booking.amount}</li>
+            </ul>
+            <p>Please proceed to payment using the following link: <a href="${booking.paymentLink}">Pay Now</a></p>
+            <p>We look forward to seeing you at the show!</p>
+            <p>Best regards,<br/>The Quickshow Team</p>
+            `
+
+            
+        })
+    
+    }
+
+);
 
 
 
 
 
-export const functions = [syncUserCreation, syncUserDeletion, syncUserUpdation, releaseSeatsAndDeleteBooking];
+
+
+export const functions = [syncUserCreation, syncUserDeletion, syncUserUpdation, releaseSeatsAndDeleteBooking,
+    sendBookingConfirmationEmail
+];
 
