@@ -50,13 +50,14 @@ input::-webkit-inner-spin-button {
 
 
 
- @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&display=swap');
 
-Tailwind directives MUST come after imports
+
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&display=swap');
+
+/* Tailwind directives MUST come after imports */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-
 
 /* Custom styles */
 * {
@@ -81,4 +82,4 @@ input::-webkit-inner-spin-button {
 
 ::-webkit-calendar-picker-indicator {
   filter: invert(1);
-} */ */
+}
