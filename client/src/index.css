@@ -1,3 +1,6 @@
+/* 
+
+
 @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&display=swap');
 @import "tailwindcss";
 
@@ -34,4 +37,40 @@ input::-webkit-inner-spin-button {
   filter: invert(1);
 } 
 
+ */
 
+
+
+
+
+ @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&display=swap');
+
+/* Tailwind directives MUST come after imports */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Custom styles */
+* {
+  font-family: "Outfit", sans-serif;
+  scrollbar-width: thin;
+  scrollbar-color: #787777 #1e1e1e;
+}
+
+body {
+  color: white;
+  background-color: #09090B;
+}
+
+.no-scrollbar {
+  scrollbar-width: none;
+}
+
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+}
+
+::-webkit-calendar-picker-indicator {
+  filter: invert(1);
+}
