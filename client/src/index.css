@@ -1,8 +1,8 @@
-/* 
+
 
 
 @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&display=swap');
-@import "tailwindcss";
+
 
 @theme{
   --color-primary: #F84565;
@@ -37,9 +37,9 @@ input::-webkit-inner-spin-button {
   filter: invert(1);
 } 
 
- */
 
 
+/* 
 
 
 
@@ -73,4 +73,4 @@ input::-webkit-inner-spin-button {
 
 ::-webkit-calendar-picker-indicator {
   filter: invert(1);
-}
+} */
