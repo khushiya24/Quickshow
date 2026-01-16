@@ -58,13 +58,6 @@ Tailwind directives MUST come after imports
 @tailwind utilities;
 
 
-
-
-
-@theme{
-  --color-primary: #F84565;
-  --color-primary: #D63854;
-}
 /* Custom styles */
 * {
   font-family: "Outfit", sans-serif;
